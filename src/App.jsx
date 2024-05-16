@@ -6,7 +6,7 @@ import Register from './auth/Register';
 import Profile from './auth/Profile';
 import { useAuth } from './contexts/AuthContext';
 import Login from './auth/Login';
-import './style.css';
+
 import ChatList from './components/chatlist';
 function App() {
   
