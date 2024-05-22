@@ -73,8 +73,11 @@ const Register = () => {
     }
 
     try {
+      console.log("Submitting registration form...");
       await signUpAccount(email, password, firstName, lastName, imageFile);
+      console.log("Registration successful.");
     } catch (error) {
+      console.error("Registration error:", error);
       if (error.code === 'auth/email-already-in-use') {
         setErrors([{ field: 'email', message: 'Email is already in use' }]);
       }
@@ -94,7 +97,7 @@ const Register = () => {
               <div className="grid grid-cols-2 gap-x-4">
                 <InputField
                   id="firstName"
-                  label="First Name"
+                  placeholder={"First Name"}
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
@@ -102,7 +105,7 @@ const Register = () => {
                 />
                 <InputField
                   id="lastName"
-                  label="Last Name"
+                  placeholder={"Last Name"}
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
@@ -111,7 +114,7 @@ const Register = () => {
               </div>
               <InputField
                 id="email"
-                label="Email address"
+                placeholder={"Email Address"}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -119,7 +122,7 @@ const Register = () => {
               />
               <InputField
                 id="password"
-                label="Password"
+                placeholder={"Password"}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -127,7 +130,7 @@ const Register = () => {
               />
               <InputField
                 id="confirmPassword"
-                label="Confirm Password"
+                placeholder={"Confirm Password"}
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -136,8 +139,8 @@ const Register = () => {
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
                 <label htmlFor="profileImageInput" className="cursor-pointer">
-                  <div className="w-full h-50 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-                    <img src={preview} alt="Profile Preview" className="object-cover w-full h-full" />
+                  <div className="w-36 h-36 rounded-lg overflow-hidden  flex items-center justify-center ml-28">
+                    <img src={preview} alt="Profile Preview" className="object-cover flex-shrink-0" />
                   </div>
                 </label>
                 <input
@@ -148,13 +151,13 @@ const Register = () => {
                   className="hidden"
                 />
                 {errors.find((error) => error.field === 'imageFile') && (
-                  <p className="mt-2 text-sm text-red-600">{errors.find((error) => error.field === 'imageFile').message}</p>
+                  <p className="mt-2 text-sm text-yellow-500 text-center">{errors.find((error) => error.field === 'imageFile').message}</p>
                 )}
               </div>
               <div>
                 <button
                   type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Register
                 </button>

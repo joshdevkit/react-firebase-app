@@ -7,8 +7,6 @@ const UserDetail = ({ user, onBack }) => {
                 <button onClick={onBack} className="mr-4 text-blue-500">
                     <FiArrowLeft size={20} />
                 </button>
-
-
                 <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full mr-3" />
                 <div>
                     <p className="text-lg font-semibold">{user.name}</p>

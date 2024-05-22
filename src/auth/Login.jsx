@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import InputField from '../components/inputs/InputFields';
 import { Helmet } from 'react-helmet-async';
-
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { currentUser, loginWithEmailPassword } = useAuth();
+  const { loginWithEmailPassword } = useAuth();
   const [errors, setErrors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const validateInputs = () => {
     const newErrors = [];
-
 
     if (!email.trim()) {
       newErrors.push({ field: 'email', message: 'Email is required' });
@@ -34,13 +34,15 @@ const Login = () => {
     if (!validateInputs()) {
       return;
     }
+    setIsLoading(true);
     try {
       await loginWithEmailPassword(email, password);
     } catch (error) {
+      setIsLoading(false);
       if (error.code === 'auth/invalid-credential') {
-        setErrors([{ field: 'password', message: 'Invalid Credentails' }]);
+        setErrors([{ field: 'password', message: 'Invalid Credentials' }]);
       } else if (error.code === 'auth/too-many-requests') {
-        setErrors([{ field: 'email', message: 'Too many Attempt please try again later' }]);
+        setErrors([{ field: 'email', message: 'Too many attempts, please try again later' }]);
       }
     }
   };
@@ -59,27 +61,21 @@ const Login = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-
               <InputField
                 id="email"
-                label="Email address"
                 type="email"
                 value={email}
+                placeholder={"Email Address"}
                 onChange={(e) => setEmail(e.target.value)}
                 error={errors.find((error) => error.field === 'email')}
               />
-
-
             </div>
-
             <div>
-              <div className="flex items-center justify-between">
-
-              </div>
+              <div className="flex items-center justify-between"></div>
               <InputField
                 id="password"
-                label="Password"
                 type="password"
+                placeholder={"Password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 error={errors.find((error) => error.field === 'password')}
@@ -89,15 +85,15 @@ const Login = () => {
             <div>
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-4 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Sign in
+                {isLoading ? 'Logging in...' : 'Sign in'}
               </button>
             </div>
             <div className="text-sm">
-              <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+              <Link to="/forgot" className="font-semibold text-indigo-600 hover:text-indigo-500">
                 Forgot password?
-              </a>
+              </Link>
             </div>
           </form>
 

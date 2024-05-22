@@ -10,7 +10,7 @@ const UserSideBarList = ({ users, onSelectUser }) => {
         <input type="text" placeholder="Search.." className="w-full p-2 rounded-md border" />
       </div>
       <div className="flex-1 overflow-y-auto">
-        <div className="py-2 px-6 text-gray-600">Archived Conversations</div>
+        <div className="py-2 px-6 text-gray-600">Active Conversations</div>
         {users.map(user => (
           <div
             key={user.id}

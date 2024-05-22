@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import { auth } from '../firebase';
+import { FaComment, FaHome, FaSignOutAlt, FaUser } from 'react-icons/fa';
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
-
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -17,47 +12,30 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-blue-500  top-0 ">
+      <div className="flex justify-center items-center text-center mb-0">
         <div className="flex items-center justify-between h-16">
-          <div className="flex-shrink-0">
-            <a href="/" className="text-white font-bold text-xl">React - Firebase</a>
-          </div>
-          <div className="hidden md:flex space-x-4">
-            <a href="/" className="text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">Home</a>
-            <a href="/chat" className="text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">Chat</a>
-            <a href="/profile" className="text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">Profile</a>
+          <div className="flex space-x-4 items-center">
+            <a href="/" className="text-white hover:bg-blue-400 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+              <FaHome className="mr-1" /> Home
+            </a>
+            <a href="/chat" className="text-white hover:bg-blue-400 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+              <FaComment className="mr-1" /> Chat
+            </a>
+            <a href="/profile" className="text-white hover:bg-blue-400 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+              <FaUser className="mr-1" /> Profile
+            </a>
             <button
               onClick={handleLogout}
-              className="text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-              Log Out
-            </button>
-          </div>
-          <div className="md:hidden flex items-center">
-            <button onClick={toggleMenu} className="text-white focus:outline-none">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                {isOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-                )}
-              </svg>
+              className="text-white hover:bg-blue-400 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+            >
+              <FaSignOutAlt className="mr-1" /> Log Out
             </button>
           </div>
         </div>
       </div>
-      {isOpen && (
-        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <a href="/" className="text-white hover:bg-gray-700 block px-3 py-2 rounded-md text-base font-medium">Home</a>
-          <a href="/chat" className="text-white hover:bg-gray-700 block px-3 py-2 rounded-md text-base font-medium">Chat</a>
-          <a href="/profile" className="text-white hover:bg-gray-700 block px-3 py-2 rounded-md text-base font-medium">Profile</a>
-          <button
-              onClick={handleLogout}
-              className="text-white hover:bg-gray-700 block px-3 py-2 rounded-md text-base font-medium">
-              Log Out
-            </button>
-        </div>
-      )}
+      
+
     </nav>
   );
 };
