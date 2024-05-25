@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare, faImage, faVideo, faCalendar, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import PostPreview from '../ui/layouts/PostPreview';
+import { useAuth } from '../../../contexts/AuthContext';
 
 
 
 
 export default function MainContent() {
+
+  const {avatarUrl } = useAuth();
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -44,8 +47,8 @@ export default function MainContent() {
         <div className="flex items-center space-x-4 mb-4">
           <img
             className="w-12 h-12 rounded-full"
-            src="https://via.placeholder.com/50"
-            alt="User"
+            src={avatarUrl}
+            alt="User Image"
           />
           <textarea
             className="w-full border rounded p-2"

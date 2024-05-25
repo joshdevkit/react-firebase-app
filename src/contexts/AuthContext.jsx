@@ -1,22 +1,22 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { auth, firestore, storage, query, where } from '../firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, getAuth, sendPasswordResetEmail } from 'firebase/auth';
-import { doc, setDoc, getDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
+import { auth, firestore, storage } from '../firebase';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
+import { doc, setDoc, getDoc, collection, getDocs, deleteDoc, query, where, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Timestamp } from 'firebase/firestore';
 
 const AuthContext = createContext();
-
-export function useAuth() {
-  return useContext(AuthContext);
-}
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [avatarUrl, setAvatarUrl] = useState('');
+
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
       setLoading(false);
       if (user) {
@@ -27,7 +27,6 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
-
   const fetchAvatarUrl = async (userId) => {
     try {
       const userDetailsRef = doc(firestore, 'user_details', userId);
@@ -37,13 +36,11 @@ export function AuthProvider({ children }) {
         setAvatarUrl(userDetailsData.avatar || '');
       }
     } catch (error) {
-      console.error("Error fetching avatar URL:", error);
+      console.error('Error fetching avatar URL:', error);
     }
   };
 
   const forgotPassword = async (email) => {
-    const auth = getAuth();
-
     try {
       await sendPasswordResetEmail(auth, email);
       return { success: true };
@@ -53,14 +50,12 @@ export function AuthProvider({ children }) {
     }
   };
 
-
   const loginWithEmailPassword = async (email, password) => {
     try {
-      console.log("Logging in user...");
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       setCurrentUser(userCredential.user);
     } catch (error) {
-      console.error("Error logging in user:", error);
+      console.error('Error logging in user:', error);
       throw error;
     }
   };
@@ -68,44 +63,28 @@ export function AuthProvider({ children }) {
   const signUpAccount = async (email, password, firstName, lastName, imageFile) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log("User created successfully:", userCredential);
-  
       setCurrentUser(userCredential.user);
       const userId = userCredential.user.uid;
       const avatarRef = ref(storage, `avatars/${userId}/${imageFile.name}`);
       await uploadBytes(avatarRef, imageFile);
       const avatarUrl = await getDownloadURL(avatarRef);
-  
+
       const userDetailsRef = doc(firestore, 'user_details', userId);
-      const docSnapshot = await getDoc(userDetailsRef);
-  
-      if (docSnapshot.exists()) {
-        await setDoc(userDetailsRef, {
-          firstName: firstName,
-          lastName: lastName,
-          avatar: avatarUrl,
-        }, { merge: true });
-      } else {
-        await setDoc(userDetailsRef, {
-          firstName: firstName,
-          lastName: lastName,
-          avatar: avatarUrl,
-        });
-      }
-  
+      await setDoc(userDetailsRef, {
+        firstName,
+        lastName,
+        avatar: avatarUrl,
+      });
     } catch (error) {
-      console.error("Error in signUpAccount:", error);
+      console.error('Error in signUpAccount:', error);
       throw error;
     }
   };
-  
-
-
 
   const getUserDetails = async () => {
     try {
       if (!currentUser) {
-        throw new Error("No user is currently logged in.");
+        throw new Error('No user is currently logged in.');
       }
       const userDetailsRef = doc(firestore, 'user_details', currentUser.uid);
       const userDetailsSnapshot = await getDoc(userDetailsRef);
@@ -113,10 +92,10 @@ export function AuthProvider({ children }) {
       if (userDetailsSnapshot.exists()) {
         return userDetailsSnapshot.data();
       } else {
-        throw new Error("User details not found.");
+        throw new Error('User details not found.');
       }
     } catch (error) {
-      console.error("Failed to fetch user details:", error);
+      console.error('Failed to fetch user details:', error);
       throw error;
     }
   };
@@ -124,7 +103,7 @@ export function AuthProvider({ children }) {
   const getUserInformations = async () => {
     try {
       if (!currentUser) {
-        throw new Error("No user is currently logged in.");
+        throw new Error('No user is currently logged in.');
       }
       const userDocRef = doc(firestore, 'user_informations', currentUser.uid);
       const userDocSnap = await getDoc(userDocRef);
@@ -135,7 +114,7 @@ export function AuthProvider({ children }) {
         return null;
       }
     } catch (error) {
-      console.error("Error fetching user information:", error);
+      console.error('Error fetching user information:', error);
       throw error;
     }
   };
@@ -143,7 +122,7 @@ export function AuthProvider({ children }) {
   const addUserInformations = async (userInfo) => {
     try {
       if (!currentUser) {
-        throw new Error("No user is currently logged in.");
+        throw new Error('No user is currently logged in.');
       }
 
       const userInfoObject = {
@@ -153,34 +132,27 @@ export function AuthProvider({ children }) {
       };
 
       const userDocRef = doc(firestore, 'user_informations', currentUser.uid);
-      const success = await setDoc(userDocRef, userInfoObject);
-      if (success) {
-        return true;
-      }
+      await setDoc(userDocRef, userInfoObject);
     } catch (error) {
-      console.error("Error adding user information:", error);
+      console.error('Error adding user information:', error);
       throw error;
     }
   };
 
-
-
   const fetchUsersExceptCurrentUser = async (currentUserId) => {
     try {
       if (!currentUserId) {
-        throw new Error("Current user ID is required.");
+        throw new Error('Current user ID is required.');
       }
 
-      // Fetch user details excluding the current user
       const userQuerySnapshot = await getDocs(collection(firestore, 'user_details'));
       const usersList = userQuerySnapshot.docs
-        .filter(doc => doc.id !== currentUserId)
-        .map(doc => ({
+        .filter((doc) => doc.id !== currentUserId)
+        .map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
 
-      // Fetch friend requests where current user is sender or receiver
       const friendRequestsQuerySender = query(
         collection(firestore, 'friendRequests'),
         where('senderId', '==', currentUserId)
@@ -192,26 +164,24 @@ export function AuthProvider({ children }) {
 
       const [friendRequestsSnapshotSender, friendRequestsSnapshotReceiver] = await Promise.all([
         getDocs(friendRequestsQuerySender),
-        getDocs(friendRequestsQueryReceiver)
+        getDocs(friendRequestsQueryReceiver),
       ]);
 
-      const friendRequestsSender = friendRequestsSnapshotSender.docs.map(doc => ({
+      const friendRequestsSender = friendRequestsSnapshotSender.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
 
-      const friendRequestsReceiver = friendRequestsSnapshotReceiver.docs.map(doc => ({
+      const friendRequestsReceiver = friendRequestsSnapshotReceiver.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
 
-      // Combine sender and receiver friend requests
       const friendRequests = [...friendRequestsSender, ...friendRequestsReceiver];
 
-      // Combine users list with friend requests
-      const combinedData = usersList.map(user => {
-        const sentRequest = friendRequests.find(fr => fr.senderId === currentUserId && fr.receiverId === user.id);
-        const receivedRequest = friendRequests.find(fr => fr.receiverId === currentUserId && fr.senderId === user.id);
+      const combinedData = usersList.map((user) => {
+        const sentRequest = friendRequests.find((fr) => fr.senderId === currentUserId && fr.receiverId === user.id);
+        const receivedRequest = friendRequests.find((fr) => fr.receiverId === currentUserId && fr.senderId === user.id);
         return {
           ...user,
           friendRequest: sentRequest || receivedRequest || null,
@@ -220,7 +190,7 @@ export function AuthProvider({ children }) {
 
       return combinedData;
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error('Error fetching users:', error);
       throw error;
     }
   };
@@ -230,12 +200,10 @@ export function AuthProvider({ children }) {
       await deleteDoc(doc(firestore, 'friendRequests', requestId));
       return true;
     } catch (error) {
-      console.error("Error canceling friend request:", error);
+      console.error('Error canceling friend request:', error);
       return false;
     }
   };
-
-
 
   const uploadAvatar = async (file) => {
     if (!currentUser) return null;
@@ -255,31 +223,28 @@ export function AuthProvider({ children }) {
     }
   };
 
-
-
-  const sendFriendRequest = async (receiverId, currentUser) => {
+  const sendFriendRequest = async (receiverId) => {
     try {
       if (!currentUser) {
-        throw new Error("No user is currently logged in.");
+        throw new Error('No user is currently logged in.');
       }
 
-      console.log("Sending friend request...");
-      const existingRequestRef = doc(firestore, "friendRequests", `${currentUser.uid}_${receiverId}`);
+      const existingRequestRef = doc(firestore, 'friendRequests', `${currentUser.uid}_${receiverId}`);
       const existingRequestSnap = await getDoc(existingRequestRef);
       if (existingRequestSnap.exists()) {
-        throw new Error("Friend request already sent.");
+        throw new Error('Friend request already sent.');
       }
 
-      const requestRef = doc(firestore, "friendRequests", `${currentUser.uid}_${receiverId}`);
+      const requestRef = doc(firestore, 'friendRequests', `${currentUser.uid}_${receiverId}`);
       await setDoc(requestRef, {
         senderId: currentUser.uid,
-        receiverId: receiverId,
-        status: "pending",
+        receiverId,
+        status: 'pending',
         createdAt: Timestamp.now(),
       });
       return true;
     } catch (error) {
-      console.error("Error sending friend request:", error);
+      console.error('Error sending friend request:', error);
       throw error;
     }
   };
@@ -287,9 +252,8 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await auth.signOut();
-      console.log("User logged out successfully.");
     } catch (error) {
-      console.error("Failed to log out", error);
+      console.error('Failed to log out', error);
     }
   };
 
@@ -315,3 +279,7 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+
+export const useAuth = () => {
+  return useContext(AuthContext);
+};

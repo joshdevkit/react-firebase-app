@@ -11,7 +11,9 @@ export default defineConfig(({ mode }) => {
       'process.env': env
     },
     plugins: [react()],
-    base: "/react-chat-app.io/",
+    server: {
+      port: 3000,
+    },
     optimizeDeps: {
       include: ['react-helmet-async']
     }
