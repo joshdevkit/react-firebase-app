@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
       'process.env': env
     },
     plugins: [react()],
-    base: https://joshdevkit.github.io/react-firebase-app.io/
+    base: /react-firebase-app.io/
     server: {
       port: 3000,
     },
